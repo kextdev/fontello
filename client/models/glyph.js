@@ -42,7 +42,8 @@ module.exports = Backbone.Model.extend({
       source    : null,
       code      : null,
       css       : null,
-      selected  : false
+      selected  : false,
+      graphics  : null
     };
   },
 

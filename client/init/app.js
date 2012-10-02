@@ -7,7 +7,7 @@
 module.exports = function () {
   var
     // jQuery $elements
-    $fontname, $users_count, $glyphs, $import,
+    $fontname, $users_count, $glyphs, $import, $load_font,
     // models
     fonts, result, session,
     // ui views
@@ -54,19 +54,27 @@ module.exports = function () {
   // Initialization
   //
 
-
-  fonts.each(function (f) {
+  var attachFontButtons = function (f) {
     f.eachGlyph(function (g) {
       toolbar.addKeywords(g.get('source').search || []);
       g.on('change:selected', function (g, val) {
         result[val ? 'add' : 'remove'](g);
       });
       g.on('click:edit-glyph-graphics', function (g) {
-        $('#glyph-graphics-edit').modal({backdrop: 'static', keyboard: false});
+        graphics_editor.editGlyph(g);
       });
     });
+  };
+
+  fonts.each(function (f) {
+//    f.eachGlyph(function (g) {
+//    });
+    attachFontButtons(f);
   });
 
+  fonts.on('add', function (font) {
+    attachFontButtons(font);
+  });
 
   toolbar.on('click:download', function () {
     result.startDownload($('#result-fontname').val());
@@ -288,4 +296,164 @@ module.exports = function () {
 
     reader.readAsBinaryString(file);
   });
+
+  //
+  // Initialize font reader
+  // todo - refactoring
+  //
+
+  var checkFileReader = function () {
+    if (!window.FileReader) {
+      nodeca.client.util.notify('error',
+        nodeca.client.render('errors.no-file-reader'));
+      return false;
+    }
+    return true;
+  };
+
+  var fontLoadSvg = function (data) {
+    var xml = $.parseXML(data);
+
+    var $font = $('font:first', xml);//.attr("id") || "unknown";
+    var $font_face = $('font-face:first', xml);
+
+    var font = {
+      "font" : {
+        'fontname'  : $font.attr('id'),
+        'fullname'  : $font_face.attr('font-family'),
+        'familyname': $font_face.attr('font-family'),
+        'descent'   : parseInt($font_face.attr('descent')),
+        'ascent'    : parseInt($font_face.attr('ascent')),
+        // fake
+        'version'   : '1.0',
+        'copyright' : '',
+        'weight'    : 'Medium',
+        // svg
+        'horiz_adv_x' : parseInt($font.attr('horiz-adv-x'))
+      },
+      "meta" : {
+        "github": "https://github.com/",
+        "license": "",
+        "author": "",
+        "twitter": "http://twitter.com/",
+        "email": "",
+        "license_url": "",
+        "css_prefix": "icon-",
+        "homepage": "",
+        "dribble": "",
+        "columns": 4
+      },
+      "glyphs" : []
+    };
+
+    // fix glyphs_map
+
+    nodeca.shared.glyphs_map[font.font.fontname] = {};
+
+    $("glyph", xml).filter(function (index) {
+      // debug
+      return true;//debug.maxglyphs && index < debug.maxglyphs || true;
+    }).each(function (index) {
+        var code;
+        var glyph = {
+          // svg
+          graphics : {
+            'horiz_adv_x' : parseInt($(this).attr('horiz-adv-x')) || font.font.horiz_adv_x,
+            d             : $(this).attr('d') || '',
+            modified      : false,
+            metrics : {
+              box : {
+                x : 0,
+                y : 0,
+                w : 0,
+                h : 0,
+                delta : 0
+              },
+              transform : {
+                tx : 0,
+                ty : 0,
+                sx : 1,
+                sy : 1
+              }
+            }
+          },
+          search  : [],
+          code    : (code = ($(this).attr('unicode') || '0').charCodeAt(0)),
+          uid     : 'genuid_'+font.font.fontname+'_'+index+'_'+code, //todo generate uid
+          file    : $(this).attr('glyph-name') || 'unknown',
+          css     : $(this).attr('glyph-name') || 'unknown'
+        };
+
+        font.glyphs.push(glyph);
+
+        // fix glyphs_map
+
+        nodeca.shared.glyphs_map[font.font.fontname][glyph.uid] = glyph.code;
+    });
+
+    return font;
+  };
+
+  $load_font = $('#import-font');
+
+  $load_font.click(function (event) {
+    event.preventDefault();
+
+    if (!checkFileReader())
+      return false;
+
+    $('#import-font-file').click();
+    return false;
+  });
+
+  $('#import-font-file').change(function (event) {
+    var file = (event.target.files || [])[0], reader;
+
+    nodeca.logger.debug('Import font requested', file);
+
+    if (!file) {
+      // Unexpected behavior. Should not happen in real life.
+      nodeca.client.util.notify('error',
+        'You must choose a file.');
+      return;
+    }
+
+    // we must "reset" value of input field.
+
+    $(this).val('');
+
+    reader = new window.FileReader();
+
+    reader.onload = function (event) {
+      var font;
+      try {
+        font = fontLoadSvg(event.target.result);
+        fonts.add([font]);
+      } catch (err) {
+        nodeca.client.util.notify('error',
+          nodeca.client.render('errors.read-font', {
+            error: (err.message || err.toString())
+          }));
+        return;
+      }
+
+      nodeca.logger.debug('Font successfully parsed', font);
+    };
+
+    reader.readAsBinaryString(file);
+  });
+
+  /*
+   debugger;
+   var a = nodeca.client.models.font.extend({
+   initialize: function (attributes) {
+   debugger;
+   console.log(attributes);
+   a.__super__.initialize.call(this, attributes);
+   }
+   });
+   var b = new a([123456]);
+
+   */
 };
+

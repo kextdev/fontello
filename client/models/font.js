@@ -3,7 +3,6 @@
 
 "use strict";
 
-
 module.exports = Backbone.Model.extend({
   defaults: function () {
     return {
@@ -35,9 +34,10 @@ module.exports = Backbone.Model.extend({
 
   addGlyph: function (data) {
     return this._glyphs.create({
-      uid     : data.uid,
-      source  : data,
-      font    : this
+      uid       : data.uid,
+      source    : data,
+      font      : this,
+      graphics  : data.graphics
     });
   },
 

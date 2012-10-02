@@ -45,7 +45,7 @@ module.exports = Backbone.View.extend({
         // Stop parent notification
         e.stopPropagation();
 
-        e.data.model.trigger('click:edit-glyph-graphics');
+        e.data.model.trigger('click:edit-glyph-graphics', e.data.model);
     }));
 
     //
