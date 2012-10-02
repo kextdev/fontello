@@ -11,8 +11,7 @@ module.exports = function () {
     // models
     fonts, result, session,
     // ui views
-    toolbar, tabs, selector, preview, editor;
-
+    toolbar, tabs, selector, preview, editor, graphics_editor;
 
   // check browser's capabilities
   if (!Modernizr.fontface) {
@@ -49,7 +48,7 @@ module.exports = function () {
   selector  = new nodeca.client.ui.panes.selector({model: fonts});
   preview   = new nodeca.client.ui.panes.preview({model: result});
   editor    = new nodeca.client.ui.panes.codes_editor({model: result});
-
+  graphics_editor = new nodeca.client.ui.graphics_editor;
 
   //
   // Initialization
@@ -61,6 +60,9 @@ module.exports = function () {
       toolbar.addKeywords(g.get('source').search || []);
       g.on('change:selected', function (g, val) {
         result[val ? 'add' : 'remove'](g);
+      });
+      g.on('click:edit-glyph-graphics', function (g) {
+        $('#glyph-graphics-edit').modal({backdrop: 'static', keyboard: false});
       });
     });
   });

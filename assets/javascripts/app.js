@@ -13,3 +13,5 @@
 //= require i18n
 //= require views
 //= require api
+//= require raphael
+

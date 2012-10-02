@@ -16,3 +16,37 @@
     #codes-editor.tab-pane.fade
       p.note Click symbol codes on black lines to edit
       #result-font
+
+//popup graphics edit
+#glyph-graphics-edit.modal.hide.fade(style="display: none;")
+  .modal-header
+    button.close(data-dismiss="modal")
+      | x
+    h3 Edit glyph
+  .modal-body
+    .paper.pull-left
+      #graphics-edit-canvas
+    .panel.pull-right
+      .control-group
+        label.control-label
+        | Name
+        .controls
+          input#glyph-name(type="text")
+      .control-group
+        label.control-label
+        | Code
+        .controls
+          input#glyph-code(type="text")
+      .control-group
+        label.control-label
+        | Grid size
+        .controls
+          #grid-size-slider
+          input#grid-size-text(type="text")
+
+  .modal-footer
+    button.btn(data-dismiss="modal")
+      | Close
+    button.btn.btn-primary
+      | Save
+
