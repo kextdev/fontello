@@ -94,6 +94,9 @@ a.src-font-name
     color #fff
     //opacity .8
 
+    .btn-glyph-edit
+      display block
+
   &.selected
     background-color #fffdfd
     border-color #d88
@@ -114,3 +117,15 @@ a.src-font-name
 
 ._3d .glyph
   text-shadow 1px 1px 1px rgba(127, 127, 127, 0.3)
+
+.btn-glyph-edit
+  position absolute
+  display none
+  padding 0 3px
+  line-height: 15px;
+  font-size: 12px;
+  top: 2px;
+  right: 2px;
+
+.btn-glyph-edit::before
+  content '\2699'

@@ -12,7 +12,19 @@ module.exports = Backbone.View.extend({
   events: {
     click: function () {
       this.model.toggle('selected');
+    },
+/*
+    Disabled by slow performance? used css (but also not fast)
+
+    mouseenter: function () {
+      this.$el.append($('<a/>', {
+        class: 'btn btn-glyph-edit'
+      }).click(function(){alert('aaa');}));
+    },
+    mouseleave: function () {
+      this.$('.btn-glyph-edit').remove();
     }
+*/
   },
 
 
@@ -25,6 +37,10 @@ module.exports = Backbone.View.extend({
 
     this.$el.data('model', this.model);
     this.$el.text(text);
+
+    this.$el.append($('<a/>', {
+      class: 'btn btn-glyph-edit'
+    }).click(function(){alert('aaa');}));
 
     //
     // Listen to the model changes
