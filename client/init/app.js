@@ -7,9 +7,9 @@
 module.exports = function () {
   var
     // jQuery $elements
-    $fontname, $users_count, $glyphs, $import, $load_font,
+    $fontname, $users_count, $glyphs, $import,
     // models
-    fonts, result, session,
+    fonts, result, session, custom_font,
     // ui views
     toolbar, tabs, selector, preview, editor, graphics_editor;
 
@@ -60,19 +60,24 @@ module.exports = function () {
       g.on('change:selected', function (g, val) {
         result[val ? 'add' : 'remove'](g);
       });
-      g.on('click:edit-glyph-graphics', function (g) {
-        graphics_editor.editGlyph(g);
-      });
     });
+
+    if (f.isEditable()) {
+      f._glyphs.on('add', function (g) {
+        g.on('click:edit-glyph-graphics', function (g) {
+          debugger;
+          graphics_editor.editGlyph(g);
+        });
+      });
+    }
   };
 
   fonts.each(function (f) {
-//    f.eachGlyph(function (g) {
-//    });
     attachFontButtons(f);
   });
 
   fonts.on('add', function (font) {
+    checkCustomFont(font);
     attachFontButtons(font);
   });
 
@@ -184,7 +189,6 @@ module.exports = function () {
 
   session.load();
 
-
   //
   // Initialize clear (selections) button
   //
@@ -237,7 +241,6 @@ module.exports = function () {
   // Initialize config reader
   //
 
-
   $import = $('#import-app-config');
 
   $import.click(function (event) {
@@ -281,7 +284,17 @@ module.exports = function () {
       var config;
 
       try {
-        config = JSON.parse(event.target.result);
+        var data = event.target.result;
+
+        var ext = file.name.split('.').pop();
+        if (ext == 'svg') {
+          loadSVGData(data);
+          nodeca.logger.debug('SVG successfully parsed');
+        } else {
+          config = JSON.parse(data);
+          nodeca.logger.debug('Config successfully parsed', config);
+          session.readConfig(config);
+        }
       } catch (err) {
         nodeca.client.util.notify('error',
           nodeca.client.render('errors.read-config', {
@@ -289,28 +302,136 @@ module.exports = function () {
           }));
         return;
       }
-
-      nodeca.logger.debug('Config successfully parsed', config);
-      session.readConfig(config);
     };
 
     reader.readAsBinaryString(file);
   });
 
-  //
-  // Initialize font reader
-  // todo - refactoring
-  //
+  // todo - font logic should moved to different place
 
-  var checkFileReader = function () {
-    if (!window.FileReader) {
-      nodeca.client.util.notify('error',
-        nodeca.client.render('errors.no-file-reader'));
-      return false;
-    }
-    return true;
+  // create empty custom font template
+
+  var createCustomFont = function () {
+    var font = {
+      "font" : {
+        'fontname'  : 'custom',
+        'fullname'  : 'Custom font',
+        'familyname': 'Custom font',
+        'descent'   : -200,
+        'ascent'    : 800,
+        // fake
+        'version'   : '1.0',
+        'copyright' : '',
+        'weight'    : 'Medium'
+      },
+      "meta" : {
+        "github": "https://github.com/",
+        "license": "",
+        "author": "",
+        "twitter": "http://twitter.com/",
+        "email": "",
+        "license_url": "",
+        "css_prefix": "icon-",
+        "homepage": "",
+        "dribble": "",
+        "columns": 4
+      },
+      "glyphs" : []
+    };
+
+    // fix glyphs_map
+
+    nodeca.shared.glyphs_map[font.font.fontname] = {};
+
+    return font;
   };
 
+
+  var getCustomFont = function () {
+    var font = null;
+    fonts.each(function (f) {
+      if (f.isCustom()) {
+        font = f;
+      }
+    });
+    return font;
+  };
+
+  var checkCustomFont = function () {
+    if (!custom_font)
+    {
+      custom_font = getCustomFont();
+
+      if (!custom_font) {
+        var font = createCustomFont();
+        fonts.add([font]);
+        // on add event update custom_font
+        // todo - should check for once
+      }
+    }
+  };
+
+  var customFontAddGlyph = function (glyph) {
+    checkCustomFont();
+     // todo - correct uid & code for undefined glyphs
+    glyph.uid = 'uid='+custom_font._glyphs.length;
+    glyph.code = custom_font._glyphs.length;
+    var fontname = custom_font.get('font').fontname;
+    // update glyphs_map
+    nodeca.shared.glyphs_map[fontname][glyph.uid] = glyph.code;
+    custom_font.addGlyph(glyph);
+  };
+
+  // result is glyphs array from SVG data
+
+
+  var readSVGFontGlyphs = function (data) {
+
+  };
+
+  var loadSVGFont = function (data) {
+    var font = custom_font;
+    var xml = $.parseXML(data);
+
+//    nodeca.shared.glyphs_map[font.font.fontname][glyph.uid] = glyph.code;
+
+//    var glyphs_map = nodeca.shared.glyphs_map[font.font.fontname];
+//    glyphs_map[glyph.uid] = glyph.code;
+
+    var $font_face = $('font-face:first', xml);
+    var descent = parseInt($font_face.attr('descent'));
+    var ascent = parseInt($font_face.attr('ascent'));
+    var glyph_width = parseInt($font.attr('horiz-adv-x'));
+
+  };
+
+  var loadSVGGlyph = function (data) {
+    var code = 0;
+    var glyph = {
+      graphics : data,
+      search  : [],
+        code    : code,
+        uid     : '',
+        file    : '',
+        css     : ''
+    };
+    return glyph;
+  };
+
+  var loadSVGData = function (data) {
+    try {
+      var glyph = loadSVGGlyph(data);
+      customFontAddGlyph(glyph);
+    } catch (err) {
+      nodeca.client.util.notify('error',
+        nodeca.client.render('errors.bad-svg', {
+          error: (err.message || err.toString())
+        }));
+      return;
+    }
+  };
+
+/*
   var fontLoadSvg = function (data) {
     var xml = $.parseXML(data);
 
@@ -392,58 +513,9 @@ module.exports = function () {
     });
 
     return font;
-  };
-
-  /*
-  $load_font = $('#import-font');
-
-  $load_font.click(function (event) {
-    event.preventDefault();
-
-    if (!checkFileReader())
-      return false;
-
-    $('#import-font-file').click();
-    return false;
-  });
-
-  $('#import-font-file').change(function (event) {
-    var file = (event.target.files || [])[0], reader;
-
-    nodeca.logger.debug('Import font requested', file);
-
-    if (!file) {
-      // Unexpected behavior. Should not happen in real life.
-      nodeca.client.util.notify('error',
-        'You must choose a file.');
-      return;
-    }
-
-    // we must "reset" value of input field.
-
-    $(this).val('');
-
-    reader = new window.FileReader();
-
-    reader.onload = function (event) {
-      var font;
-      try {
-        font = fontLoadSvg(event.target.result);
-        fonts.add([font]);
-      } catch (err) {
-        nodeca.client.util.notify('error',
-          nodeca.client.render('errors.read-font', {
-            error: (err.message || err.toString())
-          }));
-        return;
-      }
-
-      nodeca.logger.debug('Font successfully parsed', font);
-    };
-
-    reader.readAsBinaryString(file);
-  });
+  }
 */
+
   /*
    debugger;
    var a = nodeca.client.models.font.extend({

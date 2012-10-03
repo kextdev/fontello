@@ -103,6 +103,13 @@ module.exports = Backbone.View.extend({
 
     var graphics = g.get('graphics');
 
+    $(this.el).modal({backdrop: 'static', keyboard: false});
+    return;
+
+    //
+    // old
+    //
+
     this.graphics = graphics;
     this.box = graphics.metrics.box;
     this.transform = _.clone(graphics.metrics.transform);

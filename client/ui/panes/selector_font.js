@@ -55,6 +55,13 @@ module.exports = Backbone.View.extend({
       return false;
     });
 
+    // on add glyph
+    this.model._glyphs.on('add', function (glyph) {
+      // todo - create glyph twice fix
+      var view = new nodeca.client.ui.panes.selector_glyph({model: glyph});
+      this.$(".font-glyphs").append(view.render().el);
+    }, this);
+
     // process each glyph
     this.model.eachGlyph(function (glyph) {
       var view = new nodeca.client.ui.panes.selector_glyph({model: glyph});

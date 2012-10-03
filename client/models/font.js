@@ -69,9 +69,13 @@ module.exports = Backbone.Model.extend({
     return g;
   },
 
+  // for custom font
   isEditable: function () {
-    debugger;
-    return false;
+    return this.isCustom();
+  },
+
+  isCustom: function () {
+    return this.getName() == 'custom';
   },
 
   // Stub to prevent Backbone from reading or saving the model to the server.

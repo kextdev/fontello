@@ -38,10 +38,8 @@ module.exports = Backbone.View.extend({
     this.$el.data('model', this.model);
     this.$el.text(text);
 
-    debugger;
     if (this.model.get('font').isEditable()) {
-      // todo - different events model
-
+      // todo - global:different events nodeca model
       // Create and bind edit button
       this.$el.append($('<a/>', {
         class: 'btn btn-glyph-edit'

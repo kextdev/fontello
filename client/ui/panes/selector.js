@@ -12,8 +12,8 @@ module.exports = Backbone.View.extend({
     this.changeGlyphSize(nodeca.config.app.glyph_size.val);
     this.model.each(this.addFont, this);
 
-    this.model.on('add remove', function (font) {
-//      this.addFont(font);
+    // remove font should too handle
+    this.model.on('add', function (font) {
       var view = new nodeca.client.ui.panes.selector_font({model: font});
       this.$('#selector-fonts').prepend(view.render().el);
     }, this);
