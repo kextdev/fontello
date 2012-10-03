@@ -38,15 +38,20 @@ module.exports = Backbone.View.extend({
     this.$el.data('model', this.model);
     this.$el.text(text);
 
-    // Create and bind edit button
-    this.$el.append($('<a/>', {
-      class: 'btn btn-glyph-edit'
-    }).click({model:this.model}, function (e) {
+    debugger;
+    if (this.model.get('font').isEditable()) {
+      // todo - different events model
+
+      // Create and bind edit button
+      this.$el.append($('<a/>', {
+        class: 'btn btn-glyph-edit'
+      }).click($.proxy(function (e) {
         // Stop parent notification
         e.stopPropagation();
 
-        e.data.model.trigger('click:edit-glyph-graphics', e.data.model);
-    }));
+        this.model.trigger('click:edit-glyph-graphics', this.model);
+      }, this)));
+    }
 
     //
     // Listen to the model changes

@@ -69,6 +69,10 @@ module.exports = Backbone.Model.extend({
     return g;
   },
 
+  isEditable: function () {
+    debugger;
+    return false;
+  },
 
   // Stub to prevent Backbone from reading or saving the model to the server.
   // Backbone calls `Backbone.sync()` function (on fetch/save/destroy)

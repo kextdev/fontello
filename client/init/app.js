@@ -394,6 +394,7 @@ module.exports = function () {
     return font;
   };
 
+  /*
   $load_font = $('#import-font');
 
   $load_font.click(function (event) {
@@ -442,7 +443,7 @@ module.exports = function () {
 
     reader.readAsBinaryString(file);
   });
-
+*/
   /*
    debugger;
    var a = nodeca.client.models.font.extend({
