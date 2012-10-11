@@ -14,8 +14,7 @@ module.exports = Backbone.View.extend({
 
     // remove font should too handle
     this.model.on('add', function (font) {
-      var view = new nodeca.client.ui.panes.selector_font({model: font});
-      this.$('#selector-fonts').prepend(view.render().el);
+      this.addFontToLocation(font, true);
     }, this);
   },
 
@@ -26,7 +25,11 @@ module.exports = Backbone.View.extend({
 
 
   addFont: function (font) {
+    this.addFontToLocation(font, false);
+  },
+
+  addFontToLocation: function (font, location) {
     var view = new nodeca.client.ui.panes.selector_font({model: font});
-    this.$('#selector-fonts').append(view.render().el);
+    this.$('#selector-fonts')[location ? "prepend" : "append"](view.render().el);
   }
 });

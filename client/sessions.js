@@ -190,8 +190,6 @@ var Session = Backbone.Model.extend({
               css:  glyph_data.orig_css
             });
 
-        // why filter_obj_keys not used for uid, code, css?
-
         if (glyph) {
           glyph.set(filter_obj_keys(glyph_data, ['selected', 'code', 'css']));
         }

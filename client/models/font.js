@@ -9,7 +9,8 @@ module.exports = Backbone.Model.extend({
       id        : null,
       font      : null,
       meta      : null,
-      collapsed : false
+      collapsed : false,
+      editable  : false
     };
   },
 
@@ -21,6 +22,8 @@ module.exports = Backbone.Model.extend({
 
     // remove glyphs data array
     this.unset('glyphs', {silent: true});
+
+//    this.set('editable', !!attributes.editable);
 
     // process each glyph data
     _.each(attributes.glyphs || [], this.addGlyph, this);
@@ -71,11 +74,7 @@ module.exports = Backbone.Model.extend({
 
   // for custom font
   isEditable: function () {
-    return this.isCustom();
-  },
-
-  isCustom: function () {
-    return this.getName() == 'custom';
+    return this.get('editable');
   },
 
   // Stub to prevent Backbone from reading or saving the model to the server.

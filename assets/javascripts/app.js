@@ -14,4 +14,6 @@
 //= require views
 //= require api
 //= require raphael
+//= require lib/notification
+//= require lib/collapse-notify
 

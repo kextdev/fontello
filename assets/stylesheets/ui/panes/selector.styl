@@ -94,9 +94,6 @@ a.src-font-name
     color #fff
     //opacity .8
 
-    .btn-glyph-edit
-      display block
-
   &.selected
     background-color #fffdfd
     border-color #d88
@@ -117,6 +114,11 @@ a.src-font-name
 
 ._3d .glyph
   text-shadow 1px 1px 1px rgba(127, 127, 127, 0.3)
+
+.glyph
+  &:hover
+    .btn-glyph-edit
+      display block
 
 .btn-glyph-edit
   position absolute

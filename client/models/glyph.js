@@ -43,7 +43,7 @@ module.exports = Backbone.Model.extend({
       code      : null,
       css       : null,
       selected  : false,
-      graphics  : null // todo graphics -> svg (storage format)
+      graphics  : null
     };
   },
 

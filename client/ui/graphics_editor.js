@@ -51,9 +51,9 @@ module.exports = Backbone.View.extend({
     $grid_size_slider = $('#grid-size-slider').slider({
       orientation:  'horizontal',
       range:        'min',
-      value:        nodeca.config.app.editor.grid_size.val,
-      min:          nodeca.config.app.editor.grid_size.min,
-      max:          nodeca.config.app.editor.grid_size.max,
+      value:        16,
+      min:          12,
+      max:          30,
       slide:        $.proxy(function (event, ui) {
         /*jshint bitwise:false*/
         var val = ~~ui.value;
@@ -96,13 +96,13 @@ module.exports = Backbone.View.extend({
   },
 
   editGlyph: function (g) {
-    this.glyph = g;
+/*    this.glyph = g;
 
     $('#glyph-name').val(g.get('css'));
     $('#glyph-code').val(g.get('code'));
 
     var graphics = g.get('graphics');
-
+*/
     $(this.el).modal({backdrop: 'static', keyboard: false});
     return;
 

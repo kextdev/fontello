@@ -8,11 +8,6 @@ app:
   autoguess_charcode:
     min: 0xe800
     max: 0xf8ff
-  editor:
-    grid_size:
-      min: 12
-      val: 16
-      max: 30
 locales:
   enabled: [en]
   default: en

@@ -13,18 +13,6 @@ module.exports = Backbone.View.extend({
     click: function () {
       this.model.toggle('selected');
     },
-/*
-    Disabled by slow performance? used css (but also not fast)
-
-    mouseenter: function () {
-      this.$el.append($('<a/>', {
-        class: 'btn btn-glyph-edit'
-      }).click(function(){alert('aaa');}));
-    },
-    mouseleave: function () {
-      this.$('.btn-glyph-edit').remove();
-    }
-*/
   },
 
 
@@ -39,16 +27,9 @@ module.exports = Backbone.View.extend({
     this.$el.text(text);
 
     if (this.model.get('font').isEditable()) {
-      // todo - global:different events nodeca model
-      // Create and bind edit button
-      this.$el.append($('<a/>', {
-        class: 'btn btn-glyph-edit'
-      }).click($.proxy(function (e) {
-        // Stop parent notification
-        e.stopPropagation();
-
-        this.model.trigger('click:edit-glyph-graphics', this.model);
-      }, this)));
+      this.$el.append(nodeca.client.render('selector.glyph-controls', {
+        uid: uid
+      }));
     }
 
     //
