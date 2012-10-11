@@ -13,4 +13,4 @@ log/
 /public/download/
 
 .idea
-.DStore
+.DS_Store
