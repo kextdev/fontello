@@ -19,6 +19,9 @@ module.exports = Backbone.View.extend({
       $grid_size_slider,
       $grid_size_text;
 
+    // render view
+    $('#glyph-graphics-edit').html(nodeca.client.render('graphics-editor.modal'));
+
     var r = Raphael('graphics-edit-canvas', width, height);
 
     this.r = r;
@@ -93,6 +96,7 @@ module.exports = Backbone.View.extend({
 
     $grid_size_text.val($grid_size_slider.slider("value"));
 //    r.drawEditGrid();
+
   },
 
   editGlyph: function (g) {
